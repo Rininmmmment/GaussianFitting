@@ -12,10 +12,10 @@ file = st.file_uploader("File Upload", type='csv')
 try:
     data = pd.read_csv(file)
 except:
-    data = pd.read_csv("Ba.csv")
+    data = pd.read_csv("Sample.csv")
     
 ch = data['CH']
-element = data['count']  # 完成後Ba→countに変更
+element = data['count'] 
 
 #データ表示部分
 st.markdown("---")
