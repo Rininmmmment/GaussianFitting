@@ -33,7 +33,7 @@ st.subheader("Initial Value")
 shoki = ch.min() + (ch.max() - ch.min()) / 2
 count = st.sidebar.number_input("Number of Functions", 1, 4, 1)
 st.sidebar.markdown("---")
-amp1 = st.sidebar.slider("A(green)", 0, element.max(), int(element.max()/2))
+amp1 = st.sidebar.slider("A(green)", 0, int(element.max()), int(element.max()/2))
 ctr1 = st.sidebar.slider("μ(green)", 0, ch.max(), int(shoki))
 wid1 = st.sidebar.slider("width(green)", 0, 30, int(shoki/10))
 g1 = amp1 * np.exp( -((ch - ctr1)/wid1)**2)
@@ -42,7 +42,7 @@ y = g1
 
 if count > 1:
     st.sidebar.markdown("---")
-    amp2 = st.sidebar.slider("A(blue)", 0, element.max(), int(element.max()/2))
+    amp2 = st.sidebar.slider("A(blue)", 0, int(element.max()), int(element.max()/2))
     ctr2 = st.sidebar.slider("μ(blue)", 0, ch.max(), int(shoki)+5)
     wid2 = st.sidebar.slider("width(blue)", 0, 30, int(shoki/10))
     g2 = amp2 * np.exp( -((ch - ctr2)/wid2)**2)
@@ -51,7 +51,7 @@ if count > 1:
 
 if count > 2:
     st.sidebar.markdown("---")
-    amp3 = st.sidebar.slider("A(pink)", 0, element.max(), int(element.max()/2))
+    amp3 = st.sidebar.slider("A(pink)", 0, int(element.max()), int(element.max()/2))
     ctr3 = st.sidebar.slider("μ(pink)", 0, ch.max(), int(shoki)+10)
     wid3 = st.sidebar.slider("width(pink)", 0, 30, int(shoki/10))
     g3 = amp3 * np.exp( -((ch - ctr3)/wid3)**2)
@@ -60,7 +60,7 @@ if count > 2:
 
 if count > 3:
     st.sidebar.markdown("---")
-    amp4 = st.sidebar.slider("A(red)", 0, element.max(), int(element.max()/2))
+    amp4 = st.sidebar.slider("A(red)", 0, int(element.max()), int(element.max()/2))
     ctr4 = st.sidebar.slider("μ(red)", 0, ch.max(), int(shoki)+15)
     wid4 = st.sidebar.slider("width(red)", 0, 30, int(shoki/10))
     g4 = amp4 * np.exp( -((ch - ctr4)/wid4)**2)
