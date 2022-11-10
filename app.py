@@ -12,10 +12,10 @@ file = st.file_uploader("File Upload", type='csv')
 try:
     data = pd.read_csv(file)
 except:
-    data = pd.read_csv("Sample.csv")
+    data = pd.read_csv("Ba.csv")
     
 ch = data['CH']
-element = data['count'] 
+element = data['count']  # 完成後Ba→countに変更
 
 #データ表示部分
 st.markdown("---")
@@ -31,7 +31,7 @@ st.markdown("---")
 st.subheader("Initial Value")
 
 shoki = ch.min() + (ch.max() - ch.min()) / 2
-count = st.sidebar.number_input("Number of Functions", 1, 4, 1)
+count = st.sidebar.number_input("Number of Functions", 1, 5, 1)
 st.sidebar.markdown("---")
 amp1 = st.sidebar.slider("A(green)", 0, int(element.max()), int(element.max()/2))
 ctr1 = st.sidebar.slider("μ(green)", 0, int(ch.max()), int(shoki))
@@ -66,7 +66,15 @@ if count > 3:
     g4 = amp4 * np.exp( -((ch - ctr4)/wid4)**2)
     plt.fill_between(ch, g4, 0, facecolor='red', alpha=0.3)
     y = g1 + g2 + g3 + g4
-
+if count > 4:
+    st.sidebar.markdown("---")
+    amp5 = st.sidebar.slider("A(red)", 0, int(element.max()), int(element.max()/2))
+    ctr5 = st.sidebar.slider("μ(red)", 0, int(ch.max()), int(shoki)+15)
+    wid5 = st.sidebar.slider("width(red)", 0, 30, int(shoki/10))
+    g5 = amp5 * np.exp( -((ch - ctr5)/wid5)**2)
+    plt.fill_between(ch, g5, 0, facecolor='red', alpha=0.3)
+    y = g1 + g2 + g3 + g4 +g5
+    
 plt.plot(ch, y , ls='-', c='black', lw=1)
 st.pyplot(plt)
     
@@ -84,7 +92,8 @@ elif count == 3:
     guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3]
 elif count == 4:
     guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3, amp4, ctr4, wid4]
-
+elif count == 5:
+    guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3, amp4, ctr4, wid4, amp5, ctr5, wid5]
 bounds = (0, np.inf)
 
 def func(x, *params):
@@ -146,18 +155,25 @@ try:
         st.latex(r'''FWHM_2 = '''+str(FWHM2))
     if count > 2:
         sigma3 = popt[8]/np.sqrt(2)
-        FWHM3 = 2 * sigma1 * np.sqrt(2 * np.log(2))
+        FWHM3 = 2 * sigma3 * np.sqrt(2 * np.log(2))
         st.latex(r'''
     f_3(x) = '''+str(round(popt[6], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[7], 3))+r''')^2}{2*'''+str(round(popt[8]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_3 = '''+str(FWHM3))
     if count > 3:
         sigma4 = popt[11]/np.sqrt(2)
-        FWHM4 = 2 * sigma2 * np.sqrt(2 * np.log(2))
+        FWHM4 = 2 * sigma4 * np.sqrt(2 * np.log(2))
         st.latex(r'''
     f_4(x) = '''+str(round(popt[9], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[10], 3))+r''')^2}{2*'''+str(round(popt[11]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_4 = '''+str(FWHM4))
+    if count > 4:
+        sigma5 = popt[14]/np.sqrt(2)
+        FWHM5 = 2 * sigma5 * np.sqrt(2 * np.log(2))
+        st.latex(r'''
+    f_5(x) = '''+str(round(popt[12], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[13], 3))+r''')^2}{2*'''+str(round(popt[14]/np.sqrt(2), 5))+r'''^2})
+    ''')
+        st.latex(r'''FWHM_5 = '''+str(FWHM5))
 #     st.dataframe(popt, width=500, height=200)
     plt.clf()
     fit = func(ch, *popt)
