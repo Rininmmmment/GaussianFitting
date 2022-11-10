@@ -68,11 +68,11 @@ if count > 3:
     y = g1 + g2 + g3 + g4
 if count > 4:
     st.sidebar.markdown("---")
-    amp5 = st.sidebar.slider("A(red)", 0, int(element.max()), int(element.max()/2))
-    ctr5 = st.sidebar.slider("μ(red)", 0, int(ch.max()), int(shoki)+15)
-    wid5 = st.sidebar.slider("width(red)", 0, 30, int(shoki/10))
+    amp5 = st.sidebar.slider("A(yellow)", 0, int(element.max()), int(element.max()/2))
+    ctr5 = st.sidebar.slider("μ(yellow)", 0, int(ch.max()), int(shoki)+15)
+    wid5 = st.sidebar.slider("width(yellow)", 0, 30, int(shoki/10))
     g5 = amp5 * np.exp( -((ch - ctr5)/wid5)**2)
-    plt.fill_between(ch, g5, 0, facecolor='red', alpha=0.3)
+    plt.fill_between(ch, g5, 0, facecolor='yellow', alpha=0.3)
     y = g1 + g2 + g3 + g4 +g5
     
 plt.plot(ch, y , ls='-', c='black', lw=1)
