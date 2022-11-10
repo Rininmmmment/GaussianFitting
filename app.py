@@ -134,7 +134,7 @@ st.markdown("---")
 st.subheader("Display Results")
 st.markdown("**"+str(file)[13:59]+"**")
 st.sidebar.latex(r'''
-    f(x) = Aexp(-\frac{(x-μ)^2}{2σ^2})
+    f(x) = A\mathrm{exp}(-\frac{(x-μ)^2}{2σ^2})
     \\μ: average, 
     \\σ: standard\quad deviation
     ''')
@@ -144,34 +144,34 @@ try:
         sigma1 = popt[2]/np.sqrt(2)
         FWHM1 = 2 * sigma1 * np.sqrt(2 * np.log(2))
         st.latex(r'''
-    f_1(x) = '''+str(round(popt[0], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[1], 3))+r''')^2}{2*'''+str(round(popt[2]/np.sqrt(2), 5))+r'''^2})''')
+    f_1(x) = '''+str(round(popt[0], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[1], 3))+r''')^2}{2*'''+str(round(popt[2]/np.sqrt(2), 5))+r'''^2})''')
         st.latex(r'''FWHM_1 = '''+str(FWHM1))
     if count > 1:
         sigma2 = popt[5]/np.sqrt(2)
         FWHM2 = 2 * sigma2 * np.sqrt(2 * np.log(2))
         st.latex(r'''
-    f_2(x) = '''+str(round(popt[3], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[4], 3))+r''')^2}{2*'''+str(round(popt[5]/np.sqrt(2), 5))+r'''^2})
+    f_2(x) = '''+str(round(popt[3], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[4], 3))+r''')^2}{2*'''+str(round(popt[5]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_2 = '''+str(FWHM2))
     if count > 2:
         sigma3 = popt[8]/np.sqrt(2)
         FWHM3 = 2 * sigma3 * np.sqrt(2 * np.log(2))
         st.latex(r'''
-    f_3(x) = '''+str(round(popt[6], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[7], 3))+r''')^2}{2*'''+str(round(popt[8]/np.sqrt(2), 5))+r'''^2})
+    f_3(x) = '''+str(round(popt[6], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[7], 3))+r''')^2}{2*'''+str(round(popt[8]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_3 = '''+str(FWHM3))
     if count > 3:
         sigma4 = popt[11]/np.sqrt(2)
         FWHM4 = 2 * sigma4 * np.sqrt(2 * np.log(2))
         st.latex(r'''
-    f_4(x) = '''+str(round(popt[9], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[10], 3))+r''')^2}{2*'''+str(round(popt[11]/np.sqrt(2), 5))+r'''^2})
+    f_4(x) = '''+str(round(popt[9], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[10], 3))+r''')^2}{2*'''+str(round(popt[11]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_4 = '''+str(FWHM4))
     if count > 4:
         sigma5 = popt[14]/np.sqrt(2)
         FWHM5 = 2 * sigma5 * np.sqrt(2 * np.log(2))
         st.latex(r'''
-    f_5(x) = '''+str(round(popt[12], 3))+r'''*exp(-\frac{(x-'''+str(round(popt[13], 3))+r''')^2}{2*'''+str(round(popt[14]/np.sqrt(2), 5))+r'''^2})
+    f_5(x) = '''+str(round(popt[12], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[13], 3))+r''')^2}{2*'''+str(round(popt[14]/np.sqrt(2), 5))+r'''^2})
     ''')
         st.latex(r'''FWHM_5 = '''+str(FWHM5))
 #     st.dataframe(popt, width=500, height=200)
