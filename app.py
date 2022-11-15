@@ -6,95 +6,41 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pandas as pd
 
+# タイトルとアップローダー
 st.title("Data Analyze")
 file = st.file_uploader("File Upload", type='csv')
-# アップロード部分
 try:
     data = pd.read_csv(file)
 except:
     data = pd.read_csv("Sample.csv")
-    
+
+
+# --------定義部分--------------
 ch = data['CH']
 element = data['count']  # 完成後Ba→countに変更
-
-#データ表示部分
-st.markdown("---")
-st.subheader("Input Data")
-st.dataframe(data, width=500, height=200)
-
-#G初期値
-plt.scatter(ch, element, s=1)
-plt.xlabel('CH')
-plt.ylabel('count')
-
-st.markdown("---")
-st.subheader("Initial Value")
-
-shoki = ch.min() + (ch.max() - ch.min()) / 2
-count = st.sidebar.number_input("Number of Functions", 1, 5, 1)
-st.sidebar.markdown("---")
-amp1 = st.sidebar.slider("A(green)", 0, int(element.max()), int(element.max()/2))
-ctr1 = st.sidebar.slider("μ(green)", 0, int(ch.max()), int(shoki))
-wid1 = st.sidebar.slider("width(green)", 0, 30, int(shoki/10))
-g1 = amp1 * np.exp( -((ch - ctr1)/wid1)**2)
-plt.fill_between(ch, g1, 0, facecolor='lime', alpha=0.3)
-y = g1
-
-if count > 1:
-    st.sidebar.markdown("---")
-    amp2 = st.sidebar.slider("A(blue)", 0, int(element.max()), int(element.max()/2))
-    ctr2 = st.sidebar.slider("μ(blue)", 0, int(ch.max()), int(shoki)+5)
-    wid2 = st.sidebar.slider("width(blue)", 0, 30, int(shoki/10))
-    g2 = amp2 * np.exp( -((ch - ctr2)/wid2)**2)
-    plt.fill_between(ch, g2, 0, facecolor='blue', alpha=0.3)
-    y = g1 + g2
-
-if count > 2:
-    st.sidebar.markdown("---")
-    amp3 = st.sidebar.slider("A(pink)", 0, int(element.max()), int(element.max()/2))
-    ctr3 = st.sidebar.slider("μ(pink)", 0, int(ch.max()), int(shoki)+10)
-    wid3 = st.sidebar.slider("width(pink)", 0, 30, int(shoki/10))
-    g3 = amp3 * np.exp( -((ch - ctr3)/wid3)**2)
-    plt.fill_between(ch, g3, 0, facecolor='pink', alpha=0.3)
-    y = g1 + g2 + g3
-
-if count > 3:
-    st.sidebar.markdown("---")
-    amp4 = st.sidebar.slider("A(red)", 0, int(element.max()), int(element.max()/2))
-    ctr4 = st.sidebar.slider("μ(red)", 0, int(ch.max()), int(shoki)+15)
-    wid4 = st.sidebar.slider("width(red)", 0, 30, int(shoki/10))
-    g4 = amp4 * np.exp( -((ch - ctr4)/wid4)**2)
-    plt.fill_between(ch, g4, 0, facecolor='red', alpha=0.3)
-    y = g1 + g2 + g3 + g4
-if count > 4:
-    st.sidebar.markdown("---")
-    amp5 = st.sidebar.slider("A(yellow)", 0, int(element.max()), int(element.max()/2))
-    ctr5 = st.sidebar.slider("μ(yellow)", 0, int(ch.max()), int(shoki)+15)
-    wid5 = st.sidebar.slider("width(yellow)", 0, 30, int(shoki/10))
-    g5 = amp5 * np.exp( -((ch - ctr5)/wid5)**2)
-    plt.fill_between(ch, g5, 0, facecolor='yellow', alpha=0.3)
-    y = g1 + g2 + g3 + g4 +g5
-    
-plt.plot(ch, y , ls='-', c='black', lw=1)
-st.pyplot(plt)
-    
-#フィッティング部分
-st.markdown("---")
-st.subheader("Perform the Fitting")
-start = st.button("fit!")
-
-guess_total = []
-if count == 1:
-    guess_total = [amp1, ctr1, wid1]
-elif count == 2:
-    guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2]
-elif count == 3:
-    guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3]
-elif count == 4:
-    guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3, amp4, ctr4, wid4]
-elif count == 5:
-    guess_total = [amp1, ctr1, wid1, amp2, ctr2, wid2, amp3, ctr3, wid3, amp4, ctr4, wid4, amp5, ctr5, wid5]
+element_err = list(map(float, np.sqrt(element)))
+gauss_max = 7 # 関数の最大個数
+count = st.sidebar.number_input("Number of Functions", 1, gauss_max, 1) # 選択された関数の個数
+amp = [0]*(gauss_max+1)
+ctr = [0]*(gauss_max+1)
+wid = [0]*(gauss_max+1)
+g = [[] for i in range(gauss_max+1)]
+color_list = ["", "lime", "blue", "pink", "red", "silver", "cyan", "green"]
+y = 0
+ctr_shoki = ch.min() + (ch.max() - ch.min()) / 2 
+wid_shoki = ctr_shoki / 3
+guess_total = [] # 全ての推測結果を格納するリスト
 bounds = (0, np.inf)
+sigma = [0]*gauss_max
+FWHM = [0]*gauss_max
+
+def sidebar(number, color):
+    st.sidebar.markdown("---")
+    amp[number] = st.sidebar.slider("A("+color+")", 0, int(element.max()), int(element.max()/2))
+    ctr[number] = st.sidebar.slider("μ("+color+")", 0, int(ch.max()), int(ctr_shoki))
+    wid[number] = st.sidebar.slider("width("+color+")", 0, 30, int(wid_shoki))
+    g[number] = amp[number] * np.exp( -((ch - ctr[number])/wid[number])**2)
+    plt.fill_between(ch, g[number], 0, facecolor=color, alpha=0.3)
 
 def func(x, *params):
     num_func = int(len(params)/3)
@@ -110,7 +56,6 @@ def func(x, *params):
     y_sum = np.zeros_like(x)
     for i in y_list:
         y_sum = y_sum + i
-#     y_sum = y_sum + params[-1]
     return y_sum
 
 def fit_plot(x, *params):
@@ -126,6 +71,41 @@ def fit_plot(x, *params):
         y_list.append(y)
     return y_list
 
+def result(num): # 0=<num<count+1
+    st.latex(
+        r'''f_'''+str(num+1)+r'''(x) = '''+str(round(popt[num*3], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[1+num*3], 3))+r''')^2}{2*'''+str(round(popt[2+num*3]/np.sqrt(2), 5))+r'''^2}) \quad FWHM_'''+str(num+1)+r''' = '''+str(FWHM[num])
+    )
+# --------定義部分--------------
+
+
+# データ表示部分
+st.markdown("---")
+st.subheader("Input Data")
+st.dataframe(data, width=500, height=200)
+
+
+# 初期値
+st.markdown("---")
+st.subheader("Initial Value")
+for i in range(1, count+1):
+    sidebar(i, color_list[i])
+    y += g[i]
+# plt.scatter(ch, element, s=1)
+plt.errorbar(ch, element, yerr = element_err, fmt='o', markersize=2, ecolor='red', color="black")
+plt.xlabel('CH')
+plt.ylabel('count')
+plt.plot(ch, y, ls='-', c='black', lw=1)
+st.pyplot(plt)
+    
+
+#フィッティング部分
+st.markdown("---")
+st.subheader("Perform the Fitting")
+start = st.button("fit!")
+for i in range(1, count+1):
+    guess_total.append(amp[i])
+    guess_total.append(ctr[i])
+    guess_total.append(wid[i])
 if start:
     popt, pcov = curve_fit(func, ch, element, p0=guess_total, bounds=bounds)
     
@@ -135,55 +115,39 @@ st.subheader("Display Results")
 st.markdown("**"+str(file)[13:59]+"**")
 st.sidebar.latex(r'''
     f(x) = A\mathrm{exp}(-\frac{(x-μ)^2}{2σ^2})
-    \\μ: average, 
-    \\σ: standard\quad deviation
+    \\μ: \mathrm{average}
+    \\σ: \mathrm{standard\quad deviation}
     ''')
-st.write("")
 try:
-    if count > 0:
-        sigma1 = popt[2]/np.sqrt(2)
-        FWHM1 = 2 * sigma1 * np.sqrt(2 * np.log(2))
-        st.latex(r'''
-    f_1(x) = '''+str(round(popt[0], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[1], 3))+r''')^2}{2*'''+str(round(popt[2]/np.sqrt(2), 5))+r'''^2})''')
-        st.latex(r'''FWHM_1 = '''+str(FWHM1))
-    if count > 1:
-        sigma2 = popt[5]/np.sqrt(2)
-        FWHM2 = 2 * sigma2 * np.sqrt(2 * np.log(2))
-        st.latex(r'''
-    f_2(x) = '''+str(round(popt[3], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[4], 3))+r''')^2}{2*'''+str(round(popt[5]/np.sqrt(2), 5))+r'''^2})
-    ''')
-        st.latex(r'''FWHM_2 = '''+str(FWHM2))
-    if count > 2:
-        sigma3 = popt[8]/np.sqrt(2)
-        FWHM3 = 2 * sigma3 * np.sqrt(2 * np.log(2))
-        st.latex(r'''
-    f_3(x) = '''+str(round(popt[6], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[7], 3))+r''')^2}{2*'''+str(round(popt[8]/np.sqrt(2), 5))+r'''^2})
-    ''')
-        st.latex(r'''FWHM_3 = '''+str(FWHM3))
-    if count > 3:
-        sigma4 = popt[11]/np.sqrt(2)
-        FWHM4 = 2 * sigma4 * np.sqrt(2 * np.log(2))
-        st.latex(r'''
-    f_4(x) = '''+str(round(popt[9], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[10], 3))+r''')^2}{2*'''+str(round(popt[11]/np.sqrt(2), 5))+r'''^2})
-    ''')
-        st.latex(r'''FWHM_4 = '''+str(FWHM4))
-    if count > 4:
-        sigma5 = popt[14]/np.sqrt(2)
-        FWHM5 = 2 * sigma5 * np.sqrt(2 * np.log(2))
-        st.latex(r'''
-    f_5(x) = '''+str(round(popt[12], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[13], 3))+r''')^2}{2*'''+str(round(popt[14]/np.sqrt(2), 5))+r'''^2})
-    ''')
-        st.latex(r'''FWHM_5 = '''+str(FWHM5))
-#     st.dataframe(popt, width=500, height=200)
+    # 関数表示
+    for i in range(count):
+        sigma[i] = popt[2+i*3]/np.sqrt(2)
+        FWHM[i] = 2 * sigma[i] * np.sqrt(2 * np.log(2))
+        result(i)
+
+    # グラフ表示
     plt.clf()
     fit = func(ch, *popt)
-    plt.scatter(ch, element, s=1)
-    plt.plot(ch, fit , ls='-', c='black', lw=0.7)
-    plt.xlabel('CH')
-    plt.ylabel('count')
+    fig = plt.figure(figsize = (10,8))
+    ax1 = fig.add_subplot(2,1,1)
+    ax2 = fig.add_subplot(2,1,2,sharex=ax1)
+    plt.subplots_adjust(hspace=.0)
+
+    # グラフ詳細設定
+    ax1.plot(ch, fit, color="black")
+    ax1.errorbar(ch, element, yerr = element_err, fmt='.', markersize=5, ecolor='red', color="blue")
     y_list = fit_plot(ch, *popt)
     for n,i in enumerate(y_list):
-        plt.fill_between(ch, i, 0, facecolor=cm.rainbow(n/len(y_list)), alpha=0.3)
+        ax1.fill_between(ch, i, 0, facecolor=cm.rainbow(n/len(y_list)), alpha=0.3)
+    ax1.set_ylabel("count")
+
+    ax2.scatter(ch, element-fit, s=5)
+    ax2.grid(which = 'both', color='gray', linestyle='--')
+    ax2.axhline(0, color='black')
+    ax2.set_xlabel("CH")
+    ax2.set_ylabel("ε")
+
     st.pyplot(plt)
+
 except:
-    print('変数が存在しません')
+    print('aaa')
