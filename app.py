@@ -75,8 +75,8 @@ def result(num): # 0=<num<count+1
     st.latex(
         r'''f_'''+str(num+1)+r'''(x) = '''+str(round(popt[num*3], 3))+r'''*\mathrm{exp}(-\frac{(x-'''+str(round(popt[1+num*3], 3))+r''')^2}{2*'''+str(round(popt[2+num*3]/np.sqrt(2), 5))+r'''^2}) \quad FWHM_'''+str(num+1)+r''' = '''+str(FWHM[num])
     )
-# --------定義部分--------------
 
+# --------定義部分--------------
 
 # データ表示部分
 st.markdown("---")
@@ -108,7 +108,15 @@ for i in range(1, count+1):
     guess_total.append(wid[i])
 if start:
     popt, pcov = curve_fit(func, ch, element, p0=guess_total, bounds=bounds)
-    
+    fit = func(ch, *popt)
+    # 決定係数
+    avg = np.average(element) / len(element)
+    s1, s2 = 0, 0
+    for i in range(len(element)):
+        s1 += (element[i]- fit[i]) ** 2 # 残差変動
+        s2 += (fit[i]-avg) ** 2 # 回帰による変動
+        rr = s2 / (s1 + s2)
+
 #結果の確認
 st.markdown("---")
 st.subheader("Display Results")
@@ -124,10 +132,13 @@ try:
         sigma[i] = popt[2+i*3]/np.sqrt(2)
         FWHM[i] = 2 * sigma[i] * np.sqrt(2 * np.log(2))
         result(i)
+    # 決定関数表示
+    st.latex(r'''
+    R^{2}='''+str(rr)+'''
+    ''')
 
     # グラフ表示
     plt.clf()
-    fit = func(ch, *popt)
     fig = plt.figure(figsize = (10,8))
     ax1 = fig.add_subplot(2,1,1)
     ax2 = fig.add_subplot(2,1,2,sharex=ax1)
