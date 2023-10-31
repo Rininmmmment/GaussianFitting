@@ -1,4 +1,4 @@
-# G_Fitting
+# GaussianFitting
 ガウスフィッティングを視覚的に行うことができます。<br>
 ch, countの列を持ったCSVファイルをアップロードできます。<br>
 
